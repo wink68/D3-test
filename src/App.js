@@ -59,9 +59,14 @@ const App = () => {
     svg.append("g").call(xAxis).attr("transform", `translate(0, ${height})`);  /* x축을 아래쪽으로 height만큼 이동 */
     svg.append("g").call(yAxis);  /* call : 축 그리기 */
 
+    // 색상 스케일을 정의합니다. 
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // D3의 기본 10가지 카테고리 컬러를 사용
+
     // 선 추가
     lines.forEach((line, idx) => {
-      let lineEndY = line.points[line.points.length - 1].y;
+      const lineColor = colorScale(idx); // idx를 기반으로 색상을 가져옵니다.
+      let lineEndX = line.points[line.points.length - 1].x;  /* 마지막 x 좌표 */
+      let lineEndY = line.points[line.points.length - 1].y;  /* 마지막 y 좌표 */
       let labelY = lineEndY;
 
       // 범주의 위치가 다른 범주와 겹치는지 확인
@@ -80,16 +85,16 @@ const App = () => {
 
       svg.append("path")
          .attr("d", lineGenerator(line.points))
-         .attr("stroke", idx % 2 === 0 ? "blue" : "red")
+         .attr("stroke", lineColor)
          .attr("fill", "none");
 
       // x축 끝에 점선 추가
       svg.append("line")
-         .attr("x1", width)
+         .attr("x1", lineEndX)
          .attr("y1", lineEndY)  /* 그래프 선 끝 y축 높이 */
-         .attr("x2", width + (lineEndY !== labelY ? 15 : 30))  // 꺾는 선이 있는 경우에는 좌표를 조정
+         .attr("x2", lineEndY !== labelY ? width + 15 : width + 20)  // 꺾는 선이 있는 경우에는 좌표를 조정
          .attr("y2", lineEndY)
-         .attr("stroke", idx % 2 === 0 ? "blue" : "red")
+         .attr("stroke", lineColor)
          .attr("stroke-dasharray", "5,5");
 
       if (lineEndY !== labelY) {  // 꺾는 선이 필요한 경우
@@ -98,7 +103,7 @@ const App = () => {
            .attr("y1", lineEndY)
            .attr("x2", width + 15)
            .attr("y2", labelY)
-           .attr("stroke", idx % 2 === 0 ? "blue" : "red")
+           .attr("stroke", lineColor)
            .attr("stroke-dasharray", "5,5");
 
         svg.append("line")
@@ -106,7 +111,7 @@ const App = () => {
            .attr("y1", labelY)
            .attr("x2", width + 30)
            .attr("y2", labelY)
-           .attr("stroke", idx % 2 === 0 ? "blue" : "red")
+           .attr("stroke", lineColor)
            .attr("stroke-dasharray", "5,5");
       }
 
@@ -114,7 +119,7 @@ const App = () => {
       svg.append("text")
          .attr("x", width + 35)
          .attr("y", labelY + 5)
-         .attr("fill", idx % 2 === 0 ? "blue" : "red")
+         .attr("fill", lineColor)
          .text(line.category);
     });
 
