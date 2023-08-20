@@ -52,19 +52,19 @@ const App = () => {
       .y(d => d.y);
 
     // 그래프 축
-    const xScale = d3.scaleLinear().domain([0, width]).range([0, width]);     /* [최소값, 최대값] */
-    const yScale = d3.scaleLinear().domain([0, height]).range([height, 0]);   /* 기존 간격(입력범위, domain)을 새로운 간격(출력범위, range)으로 변환 */
+    const xScale = d3.scaleLinear().domain([0, width]).range([0, width]);    /* [최소값, 최대값] */
+    const yScale = d3.scaleLinear().domain([0, height]).range([height, 0]);  /* 기존 간격(입력범위, domain)을 새로운 간격(출력범위, range)으로 변환 */
     const xAxis = d3.axisBottom(xScale);  /* x축 생성 */
     const yAxis = d3.axisLeft(yScale);    /* y축 생성 */
     svg.append("g").call(xAxis).attr("transform", `translate(0, ${height})`);  /* x축을 아래쪽으로 height만큼 이동 */
     svg.append("g").call(yAxis);  /* call : 축 그리기 */
 
     // 색상 스케일을 정의
-    const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // D3의 기본 10가지 카테고리 컬러를 사용
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10);  // D3의 기본 10가지 카테고리 컬러를 사용
 
     // 선 추가 : 각 선 데이터를 순회하면서 그래프 생성
     lines.forEach((line, idx) => {
-      const lineColor = colorScale(idx); // idx를 기반으로 색상을 지정
+      const lineColor = colorScale(idx);  // idx를 기반으로 색상을 지정
       let lineEndX = line.points[line.points.length - 1].x;  /* 마지막 x 좌표 */
       let lineEndY = line.points[line.points.length - 1].y;  /* 마지막 y 좌표 */
       let labelY = lineEndY;
@@ -74,9 +74,9 @@ const App = () => {
       while (overlaps) {
         overlaps = false;
         for (let y of categoriesY) {
-          if (Math.abs(y - labelY) < 20) { // 20은 글자 크기에 따라 조정 가능
-            labelY -= 20; // 위로 20만큼 이동
-            overlaps = true; // 겹치는 것을 발견하면 overlaps를 true로 설정
+          if (Math.abs(y - labelY) < 20) {  // 20은 글자 크기에 따라 조정 가능
+            labelY -= 20;     // 위로 20만큼 이동
+            overlaps = true;  // 겹치는 것을 발견하면 overlaps를 true로 설정
             break;
           }
         }
@@ -136,7 +136,7 @@ const App = () => {
             .style("left", `${event.pageX + 10}px`)
             .style("top", `${event.pageY - 10}px`)
             .style("display", "inline-block")
-            .html(`Category: ${line.category}`);
+            .html(`${line.category}`);
         })
         .on("mouseout", () => {
           tooltip.style("display", "none");
@@ -155,7 +155,7 @@ const App = () => {
           background: "#f9f9f9",
           border: "1px solid #ccc",
           padding: "10px",
-          borderRadius: "5px",
+          borderRadius: "10px",
           pointerEvents: "none"
         }}
       ></div>
