@@ -34,14 +34,14 @@ const lines = [
 
 const App = () => {
   const svgRef = useRef(null);  // React ref를 사용하여 SVG 엘리먼트를 참조합니다.
-
-  // 각 범주의 Y 위치를 저장하는 배열
-  let categoriesY = [];
+  const tooltipRef = useRef(null);  // 툴팁을 위한 ref
+  let categoriesY = [];  // 각 범주의 Y 위치를 저장하는 배열
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);  // D3로 SVG 엘리먼트를 선택합니다.
+    const tooltip = d3.select(tooltipRef.current);
 
-    categoriesY = [];   // 범주의 Y 위치 배열을 초기화
+    categoriesY = [];  // 범주의 Y 위치 배열을 초기화
 
     const width = 800;
     const height = 400;
@@ -83,21 +83,16 @@ const App = () => {
       }
       categoriesY.push(labelY);  // 조정된 Y 위치를 배열에 추가
 
-      // 선 추가
-      svg.append("path")
-         .attr("d", lineGenerator(line.points))
-         .attr("stroke", lineColor)
-         .attr("fill", "none");
-
       // x축 끝에 점선 추가
-      svg.append("line")
-         .attr("x1", lineEndX)
-         .attr("y1", lineEndY)  /* 그래프 선 끝 y축 높이 */
-         .attr("x2", lineEndY !== labelY ? width + 15 : width + 27)  // 꺾는 선이 있는 경우에는 좌표를 조정
-         .attr("y2", lineEndY)
-         .attr("stroke", lineColor)
-         .attr("stroke-dasharray", "5,5");
-
+      svg
+        .append("line")
+        .attr("x1", lineEndX)
+        .attr("y1", lineEndY)  /* 그래프 선 끝 y축 높이 */
+        .attr("x2", lineEndY !== labelY ? width + 15 : width + 27)  // 꺾는 선이 있는 경우에는 좌표를 조정
+        .attr("y2", lineEndY)
+        .attr("stroke", lineColor)
+        .attr("stroke-dasharray", "5,5");
+      
       // 꺾는 선이 필요한 경우
       if (lineEndY !== labelY) {
         svg
@@ -108,28 +103,63 @@ const App = () => {
           .attr("y2", labelY)
           .attr("stroke", lineColor)
           .attr("stroke-dasharray", "5,5");
-
-        svg.append("line")
-           .attr("x1", width + 15)
-           .attr("y1", labelY)
-           .attr("x2", width + 30)
-           .attr("y2", labelY)
-           .attr("stroke", lineColor)
-           .attr("stroke-dasharray", "5,5");
+        
+        svg
+          .append("line")
+          .attr("x1", width + 15)
+          .attr("y1", labelY)
+          .attr("x2", width + 30)
+          .attr("y2", labelY)
+          .attr("stroke", lineColor)
+          .attr("stroke-dasharray", "5,5");
       }
-
+      
       // 범주명 추가
-      svg.append("text")
-         .attr("x", width + 35)
-         .attr("y", labelY + 5)
-         .attr("fill", lineColor)
-         .text(line.category);
+      svg
+        .append("text")
+        .attr("x", width + 35)
+        .attr("y", labelY + 5)
+        .attr("fill", lineColor)
+        .text(line.category);
+
+      // 선 추가
+      const path = svg
+        .append("path")
+        .attr("d", lineGenerator(line.points))
+        .attr("stroke", lineColor)
+        .attr("fill", "none");
+      
+      // 툴팁 이벤트 추가
+      path
+        .on("mouseover", (event, d) => {
+          tooltip
+            .style("left", `${event.pageX + 10}px`)
+            .style("top", `${event.pageY - 10}px`)
+            .style("display", "inline-block")
+            .html(`Category: ${line.category}`);
+        })
+        .on("mouseout", () => {
+          tooltip.style("display", "none");
+        });
     });
-
   }, []);
-
+  
   return (
-    <svg ref={svgRef} width={900} height={400}></svg>
+    <>
+      <svg ref={svgRef} width={900} height={400}></svg>
+      <div
+        ref={tooltipRef}
+        style={{
+          position: "absolute",
+          display: "none",
+          background: "#f9f9f9",
+          border: "1px solid #ccc",
+          padding: "10px",
+          borderRadius: "5px",
+          pointerEvents: "none"
+        }}
+      ></div>
+    </>
   );
 };
 
