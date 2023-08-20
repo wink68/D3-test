@@ -33,15 +33,15 @@ const lines = [
 ];
 
 const App = () => {
-  const svgRef = useRef(null);
+  const svgRef = useRef(null);  // React ref를 사용하여 SVG 엘리먼트를 참조합니다.
 
-  // 각 범주의 위치를 저장하는 배열
+  // 각 범주의 Y 위치를 저장하는 배열
   let categoriesY = [];
 
   useEffect(() => {
-    const svg = d3.select(svgRef.current);
+    const svg = d3.select(svgRef.current);  // D3로 SVG 엘리먼트를 선택합니다.
 
-    categoriesY = [];   // 초기화
+    categoriesY = [];   // 범주의 Y 위치 배열을 초기화
 
     const width = 800;
     const height = 400;
@@ -59,12 +59,12 @@ const App = () => {
     svg.append("g").call(xAxis).attr("transform", `translate(0, ${height})`);  /* x축을 아래쪽으로 height만큼 이동 */
     svg.append("g").call(yAxis);  /* call : 축 그리기 */
 
-    // 색상 스케일을 정의합니다. 
+    // 색상 스케일을 정의
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // D3의 기본 10가지 카테고리 컬러를 사용
 
-    // 선 추가
+    // 선 추가 : 각 선 데이터를 순회하면서 그래프 생성
     lines.forEach((line, idx) => {
-      const lineColor = colorScale(idx); // idx를 기반으로 색상을 가져옵니다.
+      const lineColor = colorScale(idx); // idx를 기반으로 색상을 지정
       let lineEndX = line.points[line.points.length - 1].x;  /* 마지막 x 좌표 */
       let lineEndY = line.points[line.points.length - 1].y;  /* 마지막 y 좌표 */
       let labelY = lineEndY;
@@ -81,8 +81,9 @@ const App = () => {
           }
         }
       }
-      categoriesY.push(labelY);
+      categoriesY.push(labelY);  // 조정된 Y 위치를 배열에 추가
 
+      // 선 추가
       svg.append("path")
          .attr("d", lineGenerator(line.points))
          .attr("stroke", lineColor)
@@ -92,19 +93,21 @@ const App = () => {
       svg.append("line")
          .attr("x1", lineEndX)
          .attr("y1", lineEndY)  /* 그래프 선 끝 y축 높이 */
-         .attr("x2", lineEndY !== labelY ? width + 15 : width + 20)  // 꺾는 선이 있는 경우에는 좌표를 조정
+         .attr("x2", lineEndY !== labelY ? width + 15 : width + 27)  // 꺾는 선이 있는 경우에는 좌표를 조정
          .attr("y2", lineEndY)
          .attr("stroke", lineColor)
          .attr("stroke-dasharray", "5,5");
 
-      if (lineEndY !== labelY) {  // 꺾는 선이 필요한 경우
-        svg.append("line")
-           .attr("x1", width + 15)
-           .attr("y1", lineEndY)
-           .attr("x2", width + 15)
-           .attr("y2", labelY)
-           .attr("stroke", lineColor)
-           .attr("stroke-dasharray", "5,5");
+      // 꺾는 선이 필요한 경우
+      if (lineEndY !== labelY) {
+        svg
+          .append("line")
+          .attr("x1", width + 15)
+          .attr("y1", lineEndY)
+          .attr("x2", width + 15)
+          .attr("y2", labelY)
+          .attr("stroke", lineColor)
+          .attr("stroke-dasharray", "5,5");
 
         svg.append("line")
            .attr("x1", width + 15)
